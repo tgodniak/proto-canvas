@@ -1,0 +1,18 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>Canvas</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/prototype/1.6.0.3/prototype.js"></script>
+  </head>
+  <body>
+    <div style="background-color:#000;padding:20px;">
+      <img id="test" src="IMG_0391.jpg" />
+    </div>
+    <script type="text/javascript" src="canvas.js"></script>
+    <script type="text/javascript">
+      document.observe("dom:loaded", function(event) {
+        c = new Canvas('test', {radius:10, border:true, borderWidth:2, addReflect:true});
+      })
+    </script>
+  </body>
+</html>
