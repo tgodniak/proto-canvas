@@ -4,8 +4,9 @@ var Canvas = Class.create({
 	    this.params  = options || {};
 	    Object.extend(this, options);
 
-	    this.height      = this.element.height;// || this.element.getHeight();
-	    this.width       = this.element.width;//  || this.element.getWidth();
+	    this.IE = navigator.appName == 'Microsoft Internet Explorer'
+	    this.height      = this.element.getHeight();
+	    this.width       = this.element.getWidth();
 	    this.radius      = this.params.radius * 2  || 20;
 
 	    this.reflection = {};
@@ -27,11 +28,15 @@ var Canvas = Class.create({
 Canvas.fn = Canvas.prototype;
 
 Canvas.fn.init = function() {
-    this.canvas = new Element('canvas', {'id':this.element.id});
-    this.ctx           = this.canvas.getContext('2d');
-    this.canvas.height = this.height;
-    this.canvas.width  = this.width;
-    this.roundedRect();
+    if (this.IE) {
+	this.vmlRoundedRect();
+    } else {
+	this.canvas = new Element('canvas', {'id':this.element.id});
+	this.ctx           = this.canvas.getContext('2d');
+	this.canvas.height = this.height;
+	this.canvas.width  = this.width;
+	this.roundedRect();
+    }
 };
 
 Canvas.fn.roundedRect = function(){
@@ -87,4 +92,26 @@ Canvas.fn.reflect = function() {
     ctx.fillStyle = gradient;
     ctx.rect(0, 0, this.reflection.width, this.reflection.height);
     ctx.fill();
+};
+
+Canvas.fn.vmlRoundedRect = function() {
+    var vml = document.createElement('');
+    var vmlParams = $H({stroked:(this.border.active ? "t" : "f"),
+			strokeweight:(this.border.width + "px;"),
+			strokecolor:this.border.color,
+			arcsize:((this.radius)/(this.height)*50) +'%',
+			style: "zoom:1;width:" + this.width + "px;height:" + this.height + "px;"});
+    
+    var vmlShape = '<v:roundrect ';
+    vmlParams.each(function(pair){
+	    vmlShape += pair.key + '="' + pair.value + '" ';
+	});
+    vmlShape += '>';
+    vmlShape += '<v:fill src="' + this.element.src + '" type="frame" />'
+    vmlShape += '</v:roundrect>';
+    vml.style.visibility = 'visible';
+    vml.innerHTML = [vmlShape ].join('');
+
+    this.element.insertAdjacentElement('BeforeBegin',vml);
+    this.element.style.display = 'none'; 
 };
