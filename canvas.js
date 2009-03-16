@@ -95,13 +95,13 @@ Canvas.fn.reflect = function() {
 };
 
 Canvas.fn.vmlRoundedRect = function() {
-    var vml = document.createElement('');
+    var vml = new Element('');
     var vmlParams = $H({stroked:(this.border.active ? "t" : "f"),
 			strokeweight:(this.border.width + "px;"),
 			strokecolor:this.border.color,
 			arcsize:((this.radius)/(this.height)*50) +'%',
 			style: "zoom:1;width:" + this.width + "px;height:" + this.height + "px;"});
-    
+
     var vmlShape = '<v:roundrect ';
     vmlParams.each(function(pair){
 	    vmlShape += pair.key + '="' + pair.value + '" ';
@@ -109,9 +109,7 @@ Canvas.fn.vmlRoundedRect = function() {
     vmlShape += '>';
     vmlShape += '<v:fill src="' + this.element.src + '" type="frame" />'
     vmlShape += '</v:roundrect>';
-    vml.style.visibility = 'visible';
-    vml.innerHTML = [vmlShape ].join('');
-
-    this.element.insertAdjacentElement('BeforeBegin',vml);
-    this.element.style.display = 'none'; 
+    vml.update(vmlShape);
+    this.element.parentNode.appendChild(vml);
+    this.element.hide();
 };
