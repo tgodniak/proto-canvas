@@ -1,7 +1,8 @@
 var Canvas = Class.create({
 	initialize: function(element, options) {
 	    this.element = $(element);
-	    this.params  = options || {};
+	    this.id      = (element.id == null || element.id == '') ? this.generateRandomId() : element.id;
+	    this.params  = options    || {};
 	    Object.extend(this, options);
 
 	    this.IE = navigator.appName == 'Microsoft Internet Explorer'
@@ -11,17 +12,17 @@ var Canvas = Class.create({
 	    this.roundCorner = this.params.round    || true
 	    this.radius      = this.params.radius*2 || 16;
 
-	    this.reflection = {};
+	    this.reflection        = {};
 	    this.reflection.active = this.params.reflect       || false;
 	    this.reflection.height = this.params.reflectHeight || 20;
 	    this.reflection.width  = this.width;
 	    this.reflection.space  = this.params.reflectSpace  || 0;
 
-	    this.border = {}
+	    this.border        = {}
 	    this.border.active = this.params.border      || false;
 	    this.border.width  = this.params.borderWidth || 1;
 	    this.border.color  = this.params.borderColor || '#FFFFFF';
-	    this.offset = 0;
+	    this.offset        = 0;
 
 	    this.init();
 	}
@@ -29,12 +30,23 @@ var Canvas = Class.create({
 
 Canvas.fn = Canvas.prototype;
 
+Canvas.fn.generateRandomId = function() {
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+    var stringLength = 10;
+    var randomString = '';
+    for (var i = 0; i < stringLength; i++) {
+	var rnum = Math.floor(Math.random() * chars.length);
+	randomString += chars.substring(rnum, rnum + 1);
+    }
+    return randomString;
+};
+
 Canvas.fn.init = function() {
     if (this.IE) {
 	if(this.roundCorner) { this.vmlRoundedRect(); }
 	if(this.reflection.active) { this.vmlReflect(); }
     } else {
-	this.canvas = new Element('canvas', {'id':this.element.id});
+	this.canvas = new Element('canvas', {'id':this.id});
 	this.ctx           = this.canvas.getContext('2d');
 	this.canvas.height = this.height;
 	this.canvas.width  = this.width;
@@ -69,8 +81,8 @@ Canvas.fn.roundedRect = function(){
 };
 
 Canvas.fn.canvasReflect = function() {
-    var div = new Element('div', {'id': this.element.id + '_wrapper', 'style':'width:' + this.reflection.width + 'px;'});
-    var canvas = new Element('canvas', {'id': this.element.id + '_reflection'});
+    var div = new Element('div', {'id': this.id + '_wrapper', 'style':'width:' + this.reflection.width + 'px;'});
+    var canvas = new Element('canvas', {'id': this.id + '_reflection'});
     var ctx = canvas.getContext("2d");
 
     canvas.height = this.reflection.height;
@@ -117,7 +129,7 @@ Canvas.fn.vmlRoundedRect = function() {
 };
 
 Canvas.fn.vmlReflect = function() {
-    var div = new Element('div', {'id': this.element.id + '_wrapper', 'style':'width:' + this.reflection.width + 'px;'});
+    var div = new Element('div', {'id': this.id + '_wrapper', 'style':'width:' + this.reflection.width + 'px;'});
     var reflection = new Element('div');
     var backgroundOffset = this.element.height-this.reflection.height;
     reflection.setStyle('background:url('+ this.element.src + ') no-repeat 0 -' + backgroundOffset + 'px');

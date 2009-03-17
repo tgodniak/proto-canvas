@@ -10,11 +10,13 @@
   <body>
     
     <div style="padding:20px;background-color:black;">
-      <img id="test" src="IMG_0391.jpg" />
+      <img class="round" src="IMG_0391.jpg" />
     </div>
     <script type="text/javascript">
       Event.observe(window, 'load', function(event) {
-        c = new Canvas('test', {radius:10, border:false, reflect:true});
+        $$('img.round').each(function(e) {
+          new Canvas(e, {radius:20, border:true, reflectHeight:50, borderWidth:5, reflect:true});
+        });
       })
     </script>
   </body>
