@@ -131,11 +131,12 @@ Canvas.fn.vmlRoundedRect = function() {
 Canvas.fn.vmlReflect = function() {
     var div = new Element('div', {'id': this.id + '_wrapper', 'style':'width:' + this.reflection.width + 'px;'});
     var reflection = new Element('div');
-    var backgroundOffset = this.element.height-this.reflection.height;
+    var backgroundOffset = this.element.height-this.reflection.height+this.reflection.space;
     reflection.setStyle('background:url('+ this.element.src + ') no-repeat 0 -' + backgroundOffset + 'px');
     reflection.setStyle('width:' + this.reflection.width-(this.border.width*2) + 'px');
+    reflection.setStyle('height:' + (this.reflection.height-this.reflection.space) + 'px');
+    reflection.setStyle('margin-top:' + this.reflection.space + 'px');
     reflection.setStyle('margin-left:' + this.border.width + 'px');
-    reflection.setStyle('height:' + this.reflection.height + 'px');
     reflection.style.filter = 'progid:DXImageTransform.Microsoft.BasicImage(grayscale=0, xray=0, mirror=1, invert=0, opacity=1, rotation=2) progid:DXImageTransform.Microsoft.Alpha(Opacity=60, FinishOpacity=0, Style=1, StartX=0, FinishX=0, StartY=0, FinishY=100)';
     this.element.parentNode.appendChild(div);
     div.insert(this.element);
