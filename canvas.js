@@ -30,6 +30,7 @@ Canvas.fn = Canvas.prototype;
 Canvas.fn.init = function() {
     if (this.IE) {
 	this.vmlRoundedRect();
+	this.vmlReflect();
     } else {
 	this.canvas = new Element('canvas', {'id':this.element.id});
 	this.ctx           = this.canvas.getContext('2d');
@@ -112,4 +113,17 @@ Canvas.fn.vmlRoundedRect = function() {
     vml.update(vmlShape);
     this.element.parentNode.appendChild(vml);
     this.element.hide();
+};
+
+Canvas.fn.vmlReflect = function() {
+    var div = new Element('div', {'id': this.element.id + '_wrapper', 'style':'width:' + this.reflection.width + 'px;'});
+    var reflection = new Element('img', {'src':this.element.src});
+    reflection.setStyle('display:block;width:' + this.reflection.width + 'px');
+    reflection.setStyle('margin-bottom:-' + (this.height-this.reflection.height) + 'px');
+
+    reflection.style.filter = 'flipv progid:DXImageTransform.Microsoft.Alpha(opacity=60, style=1, finishOpacity=0, startx=0, starty=0, finishx=0, finishy=5)';
+
+    this.element.parentNode.appendChild(div);
+    div.insert(this.element);
+    div.insert(reflection);
 };
