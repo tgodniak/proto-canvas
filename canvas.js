@@ -7,13 +7,15 @@ var Canvas = Class.create({
 	    this.IE = navigator.appName == 'Microsoft Internet Explorer'
 	    this.height      = this.element.getHeight();
 	    this.width       = this.element.getWidth();
-	    this.radius      = this.params.radius * 2  || 20;
+
+	    this.roundCorner = this.params.round    || true
+	    this.radius      = this.params.radius*2 || 16;
 
 	    this.reflection = {};
-	    this.reflection.active = this.params.addReflect    || false;
-	    this.reflection.height = this.params.reflectHeight || 25;
+	    this.reflection.active = this.params.reflect       || false;
+	    this.reflection.height = this.params.reflectHeight || 20;
 	    this.reflection.width  = this.width;
-	    this.reflection.space  = this.params.reflectSpace  || 2;
+	    this.reflection.space  = this.params.reflectSpace  || 0;
 
 	    this.border = {}
 	    this.border.active = this.params.border      || false;
@@ -29,8 +31,8 @@ Canvas.fn = Canvas.prototype;
 
 Canvas.fn.init = function() {
     if (this.IE) {
-	this.vmlRoundedRect();
-	this.vmlReflect();
+	if(this.roundCorner) { this.vmlRoundedRect(); }
+	if(this.reflection.active) { this.vmlReflect(); }
     } else {
 	this.canvas = new Element('canvas', {'id':this.element.id});
 	this.ctx           = this.canvas.getContext('2d');
@@ -62,11 +64,11 @@ Canvas.fn.roundedRect = function(){
     }
     this.ctx.clip();
     this.ctx.drawImage(this.element, x + this.offset, y + this.offset, this.width - this.offset*2, this.height - this.offset*2);
-    if (this.reflection.active) { this.reflect(); }
+    if (this.reflection.active) { this.canvasReflect(); }
     this.element.replace(this.canvas);
 };
 
-Canvas.fn.reflect = function() {
+Canvas.fn.canvasReflect = function() {
     var div = new Element('div', {'id': this.element.id + '_wrapper', 'style':'width:' + this.reflection.width + 'px;'});
     var canvas = new Element('canvas', {'id': this.element.id + '_reflection'});
     var ctx = canvas.getContext("2d");
@@ -109,7 +111,6 @@ Canvas.fn.vmlRoundedRect = function() {
 	});
     vmlShape += '>';
     vmlShape += '<v:fill src="' + this.element.src + '" type="frame" />'
-    vmlShape += '</v:roundrect>';
     vml.update(vmlShape);
     this.element.parentNode.appendChild(vml);
     this.element.hide();
@@ -121,7 +122,7 @@ Canvas.fn.vmlReflect = function() {
     reflection.setStyle('display:block;width:' + this.reflection.width + 'px');
     reflection.setStyle('margin-bottom:-' + (this.height-this.reflection.height) + 'px');
 
-    reflection.style.filter = 'flipv progid:DXImageTransform.Microsoft.Alpha(opacity=60, style=1, finishOpacity=0, startx=0, starty=0, finishx=0, finishy=5)';
+    reflection.style.filter = 'flipv progid:DXImageTransform.Microsoft.Alpha(opacity=60, style=1, finishOpacity=0, startx=0, starty=0, finishx=0, finishy=20)';
 
     this.element.parentNode.appendChild(div);
     div.insert(this.element);
