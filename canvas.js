@@ -118,12 +118,13 @@ Canvas.fn.vmlRoundedRect = function() {
 
 Canvas.fn.vmlReflect = function() {
     var div = new Element('div', {'id': this.element.id + '_wrapper', 'style':'width:' + this.reflection.width + 'px;'});
-    var reflection = new Element('img', {'src':this.element.src});
-    reflection.setStyle('display:block;width:' + this.reflection.width + 'px');
-    reflection.setStyle('margin-bottom:-' + (this.height-this.reflection.height) + 'px');
-
-    reflection.style.filter = 'flipv progid:DXImageTransform.Microsoft.Alpha(opacity=60, style=1, finishOpacity=0, startx=0, starty=0, finishx=0, finishy=20)';
-
+    var reflection = new Element('div');
+    var backgroundOffset = this.element.height-this.reflection.height;
+    reflection.setStyle('background:url('+ this.element.src + ') no-repeat 0 -' + backgroundOffset + 'px');
+    reflection.setStyle('width:' + this.reflection.width-(this.border.width*2) + 'px');
+    reflection.setStyle('margin-left:' + this.border.width + 'px');
+    reflection.setStyle('height:' + this.reflection.height + 'px');
+    reflection.style.filter = 'progid:DXImageTransform.Microsoft.BasicImage(grayscale=0, xray=0, mirror=1, invert=0, opacity=1, rotation=2) progid:DXImageTransform.Microsoft.Alpha(Opacity=60, FinishOpacity=0, Style=1, StartX=0, FinishX=0, StartY=0, FinishY=100)';
     this.element.parentNode.appendChild(div);
     div.insert(this.element);
     div.insert(reflection);
