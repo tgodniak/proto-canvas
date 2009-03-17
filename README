@@ -1,1 +1,19 @@
 ProtoCanvas
+
+1) Installation
+   * Include canvas.js and prototype.js (http://www.prototypejs.org/) in your application
+
+   * Add following line
+     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
+
+   * For IE browser add also folowing line in HEAD section
+    <style>v\: * { behavior:url(#default#VML);}</style>
+
+2) Sources
+   * http://www.prototypejs.org/
+   * http://developer.mozilla.org/en/HTML/Canvas
+   * http://www.w3.org/TR/NOTE-VML
+   * http://msdn.microsoft.com/en-us/default.aspx
+
+
+Tomasz Godniak
