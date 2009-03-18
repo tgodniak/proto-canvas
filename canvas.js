@@ -1,13 +1,13 @@
 var Canvas = Class.create({
 	initialize: function(element, options) {
 	    this.element = $(element);
-	    this.id      = (element.id == null || element.id == '') ? this.generateRandomId() : element.id;
+	    this.id      = (this.element.id == null || this.element.id == '') ? this.generateRandomId() : this.element.id;
 	    this.params  = options    || {};
 	    Object.extend(this, options);
 
 	    this.IE = navigator.appName == 'Microsoft Internet Explorer'
-	    this.height      = this.element.getHeight();
-	    this.width       = this.element.getWidth();
+	    this.height      = this.element.height;
+	    this.width       = this.element.width;
 
 	    this.roundCorner = this.params.round    || true
 	    this.radius      = this.params.radius*2 || 16;
@@ -16,14 +16,13 @@ var Canvas = Class.create({
 	    this.reflection.active = this.params.reflect       || false;
 	    this.reflection.height = this.params.reflectHeight || 20;
 	    this.reflection.width  = this.width;
-	    this.reflection.space  = this.params.reflectSpace  || 0;
+	    this.reflection.space  = this.params.reflectSpace  || 1;
 
 	    this.border        = {}
 	    this.border.active = this.params.border      || false;
-	    this.border.width  = this.params.borderWidth || 1;
+	    this.border.width  = this.params.borderWidth || 0;
 	    this.border.color  = this.params.borderColor || '#FFFFFF';
 	    this.offset        = 0;
-
 	    this.init();
 	}
     });
@@ -75,19 +74,27 @@ Canvas.fn.roundedRect = function(){
 	this.offset = this.border.width;
     }
     this.ctx.clip();
-    this.ctx.drawImage(this.element, x + this.offset, y + this.offset, this.width - this.offset*2, this.height - this.offset*2);
-    if (this.reflection.active) { this.canvasReflect(); }
-    this.element.replace(this.canvas);
+    // Condition to not draw not existing images (incorrect src).
+    var image = new Element('img', {'src':this.element.src});
+    image.onload = function(e) {
+	this.ctx.drawImage(image,
+			   x + this.offset, y + this.offset,
+			   this.width - this.offset*2, this.height - this.offset*2);
+	if (this.reflection.active) { this.canvasReflect(); }
+	this.canvas.setStyle('float:left');
+	this.element.replace(this.canvas);
+    }.bind(this);
 };
 
 Canvas.fn.canvasReflect = function() {
-    var div = new Element('div', {'id': this.id + '_wrapper', 'style':'width:' + this.reflection.width + 'px;'});
+    var div = new Element('div', {'id': this.id + '_wrapper', 'style':'width:' + this.width + 'px;'});
     var canvas = new Element('canvas', {'id': this.id + '_reflection'});
     var ctx = canvas.getContext("2d");
 
     canvas.height = this.reflection.height;
-    canvas.width  = this.reflection.width;
-    
+    canvas.width  = this.width;
+    canvas.setStyle('margin-top:' + this.reflection.space + 'px');
+
     this.element.parentNode.insert(div);
     div.insert(this.element);    
     div.insert(canvas);
@@ -95,7 +102,7 @@ Canvas.fn.canvasReflect = function() {
     ctx.save();
     ctx.translate(0, this.height);
     ctx.scale(1,-1);
-    ctx.drawImage(this.canvas, 0, -this.reflection.space, this.width, this.height);
+    ctx.drawImage(this.canvas, 0, 0, this.width, this.height);
     ctx.restore();
     ctx.globalCompositeOperation = "destination-out";
 
@@ -105,17 +112,20 @@ Canvas.fn.canvasReflect = function() {
     gradient.addColorStop(1.0, "rgba(255, 255, 255, 0.9)");
 
     ctx.fillStyle = gradient;
-    ctx.rect(0, 0, this.reflection.width, this.reflection.height);
+    ctx.rect(0, 0, this.width, this.reflection.height);
     ctx.fill();
 };
 
 Canvas.fn.vmlRoundedRect = function() {
+    if(this.height == 0) { this.height = parseInt(this.element.currentStyle.height); };
+    if(this.width  == 0) { this.width  = parseInt(this.element.currentStyle.width); };
+
     var vml = new Element('');
     var vmlParams = $H({stroked:(this.border.active ? "t" : "f"),
 			strokeweight:(this.border.width + "px;"),
 			strokecolor:this.border.color,
 			arcsize:((this.radius)/(this.height)*50) +'%',
-			style: "zoom:1;width:" + this.width + "px;height:" + this.height + "px;"});
+			style: "display:block;margin:0;padding:0;zoom:1;width:" + (this.width-1-this.border.width*2) + "px;height:" + this.height + "px;"});
 
     var vmlShape = '<v:roundrect ';
     vmlParams.each(function(pair){
@@ -129,14 +139,15 @@ Canvas.fn.vmlRoundedRect = function() {
 };
 
 Canvas.fn.vmlReflect = function() {
-    var div = new Element('div', {'id': this.id + '_wrapper', 'style':'width:' + this.reflection.width + 'px;'});
-    var reflection = new Element('div');
-    var backgroundOffset = this.element.height-this.reflection.height+this.reflection.space;
+    var div = new Element('div', {'id': this.id + '_wrapper',
+				  'style':'width:' + (this.width-1-this.border.width*2) + 'px;'});
+    var reflection = new Element('div', {'style':'height:20px;'});
+    var backgroundOffset = this.height-this.reflection.height+this.reflection.space;
+    backgroundOffset = 30;
     reflection.setStyle('background:url('+ this.element.src + ') no-repeat 0 -' + backgroundOffset + 'px');
-    reflection.setStyle('width:' + this.reflection.width-(this.border.width*2) + 'px');
-    reflection.setStyle('height:' + (this.reflection.height-this.reflection.space) + 'px');
+    reflection.setStyle('height:' + this.reflection.height + 'px');
     reflection.setStyle('margin-top:' + this.reflection.space + 'px');
-    reflection.setStyle('margin-left:' + this.border.width + 'px');
+    reflection.setStyle('margin-left:' + (this.border.width/2+2) + 'px');
     reflection.style.filter = 'progid:DXImageTransform.Microsoft.BasicImage(grayscale=0, xray=0, mirror=1, invert=0, opacity=1, rotation=2) progid:DXImageTransform.Microsoft.Alpha(Opacity=60, FinishOpacity=0, Style=1, StartX=0, FinishX=0, StartY=0, FinishY=100)';
     this.element.parentNode.appendChild(div);
     div.insert(this.element);
