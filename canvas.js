@@ -20,8 +20,8 @@ var Canvas = Class.create({
 
 	    this.border        = {}
 	    this.border.active = this.params.border      || false;
-	    this.border.width  = this.params.borderWidth || 0;
-	    this.border.color  = this.params.borderColor || '#FFFFFF';
+	    this.border.width  = this.params.borderWidth || 1;
+	    this.border.color  = this.params.borderColor || '#FF0000';
 	    this.offset        = 0;
 	    this.init();
 	}
@@ -74,7 +74,7 @@ Canvas.fn.roundedRect = function(){
 	this.offset = this.border.width;
     }
     this.ctx.clip();
-    // Condition to not draw not existing images (incorrect src).
+    // Condition for drawing not existing images.
     var image = new Element('img', {'src':this.element.src});
     image.onload = function(e) {
 	this.ctx.drawImage(image,
@@ -93,7 +93,8 @@ Canvas.fn.canvasReflect = function() {
 
     canvas.height = this.reflection.height;
     canvas.width  = this.width;
-    canvas.setStyle('margin-top:' + this.reflection.space + 'px');
+    canvas.setStyle('float:left;');
+    canvas.setStyle('margin-top:' + this.reflection.space + 'px;');
 
     this.element.parentNode.insert(div);
     div.insert(this.element);    
@@ -124,8 +125,8 @@ Canvas.fn.vmlRoundedRect = function() {
     var vmlParams = $H({stroked:(this.border.active ? "t" : "f"),
 			strokeweight:(this.border.width + "px;"),
 			strokecolor:this.border.color,
-			arcsize:((this.radius)/(this.height)*50) +'%',
-			style: "display:block;margin:0;padding:0;zoom:1;width:" + (this.width-1-this.border.width*2) + "px;height:" + this.height + "px;"});
+			arcsize:((this.radius)/(this.height)*70) +'%',
+			style: "display:block;margin:-1px 0 0 -1px;padding:0;zoom:1;width:" + (this.width+3-this.border.width*2) + "px;height:" + (this.height+1) + "px;"});
 
     var vmlShape = '<v:roundrect ';
     vmlParams.each(function(pair){
@@ -140,14 +141,14 @@ Canvas.fn.vmlRoundedRect = function() {
 
 Canvas.fn.vmlReflect = function() {
     var div = new Element('div', {'id': this.id + '_wrapper',
-				  'style':'width:' + (this.width-1-this.border.width*2) + 'px;'});
-    var reflection = new Element('div', {'style':'height:20px;'});
+				  'style':'width:' + (this.width-2-this.border.width*2) + 'px;'});
+    var reflection = new Element('div', {'style':'height:' + this.reflection.height + 'px;'});
     var backgroundOffset = this.height-this.reflection.height+this.reflection.space;
     backgroundOffset = 30;
-    reflection.setStyle('background:url('+ this.element.src + ') no-repeat 0 -' + backgroundOffset + 'px');
+    reflection.setStyle('background:url('+ this.element.src + ') no-repeat -' + (this.border.width+3) + ' -' + backgroundOffset + 'px');
     reflection.setStyle('height:' + this.reflection.height + 'px');
     reflection.setStyle('margin-top:' + this.reflection.space + 'px');
-    reflection.setStyle('margin-left:' + (this.border.width/2+2) + 'px');
+    reflection.setStyle('margin-left:' + (this.border.width+2) + 'px');
     reflection.style.filter = 'progid:DXImageTransform.Microsoft.BasicImage(grayscale=0, xray=0, mirror=1, invert=0, opacity=1, rotation=2) progid:DXImageTransform.Microsoft.Alpha(Opacity=60, FinishOpacity=0, Style=1, StartX=0, FinishX=0, StartY=0, FinishY=100)';
     this.element.parentNode.appendChild(div);
     div.insert(this.element);
