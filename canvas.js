@@ -135,7 +135,7 @@ Canvas.fn.vmlRoundedRect = function() {
     vmlShape += '>';
     vmlShape += '<v:fill src="' + this.element.src + '" type="frame" />'
     vml.update(vmlShape);
-    this.element.parentNode.appendChild(vml);
+    $(this.element.parentNode).insert(vml);
     this.element.hide();
 };
 
@@ -144,13 +144,12 @@ Canvas.fn.vmlReflect = function() {
 				  'style':'width:' + (this.width-2-this.border.width*2) + 'px;'});
     var reflection = new Element('div', {'style':'height:' + this.reflection.height + 'px;'});
     var backgroundOffset = this.height-this.reflection.height+this.reflection.space;
-    backgroundOffset = 30;
     reflection.setStyle('background:url('+ this.element.src + ') no-repeat -' + (this.border.width+3) + ' -' + backgroundOffset + 'px');
     reflection.setStyle('height:' + this.reflection.height + 'px');
     reflection.setStyle('margin-top:' + this.reflection.space + 'px');
     reflection.setStyle('margin-left:' + (this.border.width+2) + 'px');
     reflection.style.filter = 'progid:DXImageTransform.Microsoft.BasicImage(grayscale=0, xray=0, mirror=1, invert=0, opacity=1, rotation=2) progid:DXImageTransform.Microsoft.Alpha(Opacity=60, FinishOpacity=0, Style=1, StartX=0, FinishX=0, StartY=0, FinishY=100)';
-    this.element.parentNode.appendChild(div);
+    $(this.element.parentNode).insert(div);
     div.insert(this.element);
     div.insert(reflection);
 };
